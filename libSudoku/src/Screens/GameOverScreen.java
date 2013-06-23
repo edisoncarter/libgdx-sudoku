@@ -1,15 +1,17 @@
 package Screens;
 
 import GameUtils.*;
-
+import GameObjects.*;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -17,24 +19,23 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.acumenvn.libsudoku.MyMainGame;
+import com.acumenvn.libsudoku.MyMainGame;;
 
 
-public class AboutScreen implements Screen {
+public class GameOverScreen implements Screen {
 
-	MyMainGame mGame;
-	Texture mTextureBackground;
-	Texture mTextureSelector;
-	SpriteBatch mBatch;
-	Boolean isSelected;
-	int menuIndex;
-	TextWrapper txtTitle;
-	TextWrapper txtHPT;
-	TextWrapper txtHau;
-	TextWrapper txtTri;
-	TextWrapper txtBack;
+	private MyMainGame mGame;
+	private SpriteBatch mBatch;
+	private Texture mTextureBackground;
+	private TextWrapper txtCongrats;
+	private TextWrapper txtTime;
+	private TextWrapper txtEnterToComplete;
+	private TextWrapper txtGameMode;
+	Sound mSoundFinish;
+	public String timeStr;
 	
-	InputProcessor mInput = new InputProcessor() {
+	
+	private InputProcessor mInput = new InputProcessor() {
 		
 		@Override
 		public boolean touchUp(int screenX, int screenY, int pointer, int button) {
@@ -63,11 +64,6 @@ public class AboutScreen implements Screen {
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
 			// TODO Auto-generated method stub
-			isSelected = false;
-			if(screenX > 65 && screenX < 200 && 
-					screenY > 310 && screenY < 340) {
-				isSelected = true;
-			}
 			return false;
 		}
 		
@@ -86,43 +82,55 @@ public class AboutScreen implements Screen {
 		@Override
 		public boolean keyDown(int keycode) {
 			// TODO Auto-generated method stub
-			if(keycode == Keys.ESCAPE) {
+			if(keycode == Keys.ENTER) {
+				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSelectMenu);
 				mGame.setScreen(new MainMenuScreen(mGame));
 			}
 			return false;
 		}
 	};
 	
-	public AboutScreen(MyMainGame game) {
+	public GameOverScreen(MyMainGame game) {
 		// TODO Auto-generated constructor stub
 		this.mGame = game;
-		mBatch = new SpriteBatch();
-		isSelected = false;
 		GameUtils.setInputProcessor(mInput);
-		mTextureBackground = TextureManager.getInstance().textureBackgroundOutGame;
-		mTextureSelector = TextureManager.getInstance().textureMainMenuSelector;
-		txtTitle = new TextWrapper("Settings", new Vector2(120, 520));
-		txtHau = new TextWrapper("Le Huynh Trung Hau - 0952082", new Vector2(200, 450));
-		txtTri = new TextWrapper("Vo Minh Tri - 09520319", new Vector2(200, 400));
-		txtHPT = new TextWrapper("Hua Phuoc Truong - 09520382", new Vector2(200, 350));
-		txtBack = new TextWrapper("Back", new Vector2(150, 300));
+		mBatch = new SpriteBatch();
+		mSoundFinish = SoundManager.getInstance().mSoundFinish;
+		Gdx.graphics.setContinuousRendering(false);
+		Gdx.graphics.requestRendering();
+		mTextureBackground = TextureManager.getInstance().textureVictory;
+		txtEnterToComplete = new TextWrapper("Press enter to go to Main Menu", new Vector2(400, 100));
+		txtTime = new TextWrapper("", new Vector2(400,150));
+		txtCongrats = new TextWrapper("Congratulation! You have complete a sudoku", new Vector2(0,0));
+		String levelStr = "";
+		switch (GameUtils.getInstance().levelIndex) {
+		case 0:
+			levelStr = "Easy";
+			break;
+		case 1:
+			levelStr = "Normal";
+			break;
+		case 2:
+			levelStr = "Hard";
+			break;
+		default:
+			break;
+		}
+		txtGameMode = new TextWrapper("Level: " + levelStr, new Vector2(400, 180));
 	}
 	
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
 		GameUtils.clearScreen();
+		
 		mBatch.begin();
 		mBatch.draw(mTextureBackground, 0, 0);
-		mBatch.draw(mTextureSelector, 25, 255);
-		
-		txtTitle.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
-		txtHau.Draw(mBatch, GameUtils.getInstance().aboutFont, Color.WHITE);
-		txtTri.Draw(mBatch, GameUtils.getInstance().aboutFont, Color.WHITE);
-		txtHPT.Draw(mBatch, GameUtils.getInstance().aboutFont, Color.WHITE);
-		txtBack.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtEnterToComplete.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtTime.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtGameMode.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtCongrats.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
 		mBatch.end();
-		handleInput();
 	}
 
 	@Override
@@ -134,7 +142,8 @@ public class AboutScreen implements Screen {
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
+		txtTime.content = "In: " + timeStr;
+		SoundManager.getInstance().playSound(mSoundFinish);
 	}
 
 	@Override
@@ -158,18 +167,6 @@ public class AboutScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		mBatch.dispose();
-		mTextureBackground.dispose();
-		
-	}
-	
-	private void handleInput() {
-		if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			if(isSelected) {
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSelectMenu);
-				this.mGame.setScreen(new MainMenuScreen(this.mGame));
-			}
-		}
 		
 	}
 

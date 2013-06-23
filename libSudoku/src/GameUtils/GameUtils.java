@@ -27,6 +27,8 @@ public class GameUtils {
 	public Boolean sound;
 	public Boolean music;
 	public BitmapFont systemFont;
+	public BitmapFont aboutFont;
+	public BitmapFont lockMatrixFont;
 	
 	public int levelIndex;
 	
@@ -46,6 +48,8 @@ public class GameUtils {
 		sound = true;
 		music = true;
 		systemFont = new BitmapFont(Gdx.files.internal("Fonts/systemFont.fnt"), false);
+		aboutFont = new BitmapFont(Gdx.files.internal("Fonts/aboutFont.fnt"), false);
+		lockMatrixFont = new BitmapFont(Gdx.files.internal("Fonts/myFont.fnt"), false);
 	}
 	
 }

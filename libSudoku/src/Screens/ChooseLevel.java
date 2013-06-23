@@ -6,6 +6,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -29,6 +30,9 @@ public class ChooseLevel implements Screen {
 	TextWrapper mTxtNormal;
 	TextWrapper mTxtHard;
 	TextWrapper mTxtExit;
+	Boolean isSelected;
+	int selector_Y;
+	int menuIndex;
 	InputProcessor mInputP = new InputProcessor() {
 		
 		@Override
@@ -58,6 +62,44 @@ public class ChooseLevel implements Screen {
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
 			// TODO Auto-generated method stub
+						isSelected = false;
+						// Easy
+						if(screenX > 65 && screenX < 200 && 
+								screenY > 160 && screenY < 190) {
+							SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
+							menuIndex = 0;
+							selector_Y = 600 - 185;
+							isSelected = true;
+						}
+						
+						
+						// Normal
+						if(screenX > 65 && screenX < 200 && 
+								screenY > 210 && screenY < 240) {
+							selector_Y = 600 - 235;
+							menuIndex = 1;
+							isSelected = true;
+							SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
+						}
+						
+						// Hard
+						
+						if(screenX > 65 && screenX < 200 && 
+								screenY > 260 && screenY < 290) {
+							selector_Y = 600 - 285;
+							menuIndex = 2;
+							isSelected = true;
+							SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
+						}
+						// Back
+						
+						if(screenX > 65 && screenX < 200 && 
+								screenY > 310 && screenY < 340) {
+							selector_Y  = 600 - 335;
+							menuIndex = 3;
+							isSelected = true;
+							SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
+						}
 			return false;
 		}
 		
@@ -84,6 +126,7 @@ public class ChooseLevel implements Screen {
 	
 	public ChooseLevel(MyMainGame game) {
 		this.mGame = game;
+		isSelected = false;
 		mSpriteBatch = new SpriteBatch();
 		Gdx.graphics.setContinuousRendering(false);
 		Gdx.graphics.requestRendering();
@@ -94,7 +137,8 @@ public class ChooseLevel implements Screen {
 		mTxtEasy = new TextWrapper("Easy", new Vector2(150,450));
 		mTxtNormal = new TextWrapper("Normal", new Vector2(150,400));
 		mTxtHard = new TextWrapper("Hard", new Vector2(150, 350));
-		mTxtExit = new TextWrapper("Exit", new Vector2(150, 300));
+		mTxtExit = new TextWrapper("Back", new Vector2(150, 300));
+		selector_Y = (int)mTxtEasy.position.y - 35;
 	}
 	
 	@Override
@@ -103,13 +147,15 @@ public class ChooseLevel implements Screen {
 		GameUtils.clearScreen();
 		mSpriteBatch.begin();
 		mSpriteBatch.draw(mTextureBackground, 0, 0);
-		GameUtils.getInstance().systemFont.scale(1.5f);
 		mTxtChooseTitle.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
 		mTxtEasy.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
 		mTxtNormal.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
 		mTxtHard.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
 		mTxtExit.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		mSpriteBatch.draw(mTextureSelector, 25, selector_Y);
 		mSpriteBatch.end();
+		
+		handleInput();
 	}
 
 	@Override
@@ -148,4 +194,39 @@ public class ChooseLevel implements Screen {
 		
 	}
 
+	private void goToGame() {
+		this.mGame.setScreen(new GamePlayScreen(mGame));
+	}
+	
+	private void handleInput() {
+		if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
+			if(isSelected) {
+				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSelectMenu);
+				switch (menuIndex) {
+				case 0:
+					// Easy
+					GameUtils.getInstance().levelIndex = 0;
+					goToGame();
+					break;
+				case 1:
+					// Normal
+					GameUtils.getInstance().levelIndex = 1;
+					goToGame();
+					break;
+				case 2:
+					// Hard
+					GameUtils.getInstance().levelIndex = 2;
+					goToGame();
+					break;
+				case 3:
+					// Back
+					this.mGame.setScreen(new MainMenuScreen(mGame));
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+	
 }

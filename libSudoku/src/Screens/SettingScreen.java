@@ -22,29 +22,20 @@ import com.badlogic.gdx.math.Vector2;
 import com.acumenvn.libsudoku.MyMainGame;
 
 
-public class MainMenuScreen implements Screen {
+public class SettingScreen implements Screen {
 
-	// Variables
+	SpriteBatch mBatch;
 	MyMainGame mGame;
-	SpriteBatch mSpriteBatch;
-	Texture mTextureMainBackground;
-	Texture mTextureMainMenu;
-	Texture mTextureSelector;
-	int menuIndex;
-	int selector_X;
+	TextWrapper txtSound;
+	TextWrapper txtMusic;
+	TextWrapper txtTitle;
+	TextWrapper txtBack;
+	Texture selector;
+	Texture background;
 	int selector_Y;
 	Boolean isSelected;
-	Sound selectMenu;
-	Sound switchMenu;
-	TextWrapper mTxtTitle;
-	TextWrapper mTxtNewGame;
-	TextWrapper mTxtSolve;
-	TextWrapper mTxtSetting;
-	TextWrapper mTxtAbout;
-	TextWrapper mTxtExit;
-	int selectedIndex;
-	
-	InputProcessor mInputP = new InputProcessor() {
+	int menuIndex;
+	InputProcessor mInput = new InputProcessor() {
 		
 		@Override
 		public boolean touchUp(int screenX, int screenY, int pointer, int button) {
@@ -73,7 +64,6 @@ public class MainMenuScreen implements Screen {
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
 			// TODO Auto-generated method stub
-			// New Game
 			isSelected = false;
 			if(screenX > 65 && screenX < 200 && 
 					screenY > 160 && screenY < 190) {
@@ -81,7 +71,6 @@ public class MainMenuScreen implements Screen {
 				menuIndex = 0;
 				selector_Y = 600 - 185;
 				isSelected = true;
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
 			}
 			
 			
@@ -91,36 +80,15 @@ public class MainMenuScreen implements Screen {
 				selector_Y = 600 - 235;
 				menuIndex = 1;
 				isSelected = true;
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
 			}
 			
-			// Setting
-			
+			// Back
 			if(screenX > 65 && screenX < 200 && 
 					screenY > 260 && screenY < 290) {
 				selector_Y = 600 - 285;
 				menuIndex = 2;
 				isSelected = true;
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
 			}
-			// About
-			
-			if(screenX > 65 && screenX < 200 && 
-					screenY > 310 && screenY < 340) {
-				selector_Y  = 600 - 335;
-				menuIndex = 3;
-				isSelected = true;
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
-			}
-			// Exit
-			if(screenX > 65 && screenX < 200 && 
-					screenY > 360 && screenY < 390) {
-				selector_Y = 600 - 385;
-				menuIndex = 4;
-				isSelected = true;
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
-			}
-			
 			return false;
 		}
 		
@@ -142,51 +110,49 @@ public class MainMenuScreen implements Screen {
 			return false;
 		}
 	};
-
 	
-	public MainMenuScreen(MyMainGame game) {
+	public SettingScreen(MyMainGame game) {
+		// TODO Auto-generated constructor stub
 		this.mGame = game;
+		mBatch = new SpriteBatch();
+		String music = "";
+		String sound = "";
 		isSelected = false;
-		mTextureMainBackground = TextureManager.getInstance().textureBackgroundOutGame;
-		mTextureSelector = TextureManager.getInstance().textureMainMenuSelector;
-		mSpriteBatch = new SpriteBatch();
-		selector_X = 30;
+		GameUtils.setInputProcessor(mInput);
+		if(GameUtils.getInstance().music) {
+			music = "Music: ON";
+		} else {
+			music = "Music: OFF";
+		}
 		
-		GameUtils.setInputProcessor(mInputP);
-//		selectMenu = SoundManager.getInstance().mSoundMenuClick;
-//		switchMenu = SoundManager.getInstance().mSoundSelectMenu;
-		mTxtTitle = new TextWrapper("TNT Sudoku", new Vector2(120,520));
-	
-		
-		mTxtNewGame = new TextWrapper("New Game", new Vector2(150,450));
-		mTxtSetting = new TextWrapper("Settings", new Vector2(150, 350));
-		mTxtSolve = new TextWrapper("Solve", new Vector2(150,400));
-		mTxtAbout = new TextWrapper("About", new Vector2(150, 300));
-		mTxtExit = new TextWrapper("Exit", new Vector2(150, 250));
-		selector_Y = (int)mTxtNewGame.position.y - 35;
+		if(GameUtils.getInstance().sound) {
+			sound = "Sound: ON";
+		} else {
+			sound = "Sound: OFF";	
+		}
 		Gdx.graphics.setContinuousRendering(false);
 		Gdx.graphics.requestRendering();
+		background = TextureManager.getInstance().textureBackgroundOutGame;
+		selector = TextureManager.getInstance().textureMainMenuSelector;
+		txtTitle = new TextWrapper("Settings", new Vector2(120, 520));
+		txtMusic = new TextWrapper(music, new Vector2(150, 450));
+		txtSound = new TextWrapper(sound, new Vector2(150, 400));
+		txtBack = new TextWrapper("Back", new Vector2(150, 350));
+		selector_Y = (int)txtMusic.position.y - 35;
 	}
 	
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
 		GameUtils.clearScreen();
-		mSpriteBatch.begin();
-		mSpriteBatch.draw(mTextureMainBackground, 0, 0);
-		GameUtils.getInstance().systemFont.setColor(Color.RED);
-		mTxtTitle.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE, 1.5f);
-		
-		GameUtils.getInstance().systemFont.setScale(1.2f);
-		GameUtils.getInstance().systemFont.setColor(Color.RED);
-		mTxtNewGame.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.RED);
-		mTxtSolve.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.RED);
-		mTxtSetting.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.RED);
-		mTxtAbout.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.RED);
-		mTxtExit.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.RED);
-		
-		mSpriteBatch.draw(mTextureSelector, selector_X, selector_Y);
-		mSpriteBatch.end();
+		mBatch.begin();
+		mBatch.draw(background, 0, 0);
+		txtTitle.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtMusic.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtSound.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		txtBack.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+		mBatch.draw(selector, 25, selector_Y);
+		mBatch.end();
 		
 		handleInput();
 	}
@@ -224,34 +190,35 @@ public class MainMenuScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		mTextureMainBackground.dispose();
-		mSpriteBatch.dispose();
+		
 	}
-	
+
 	private void handleInput() {
 		if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
 			if(isSelected) {
-				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSelectMenu);
 				switch (menuIndex) {
 				case 0:
-					// Start game
-					this.mGame.setScreen(new ChooseLevel(this.mGame));
+					// Sound
+					if(GameUtils.getInstance().music) {
+						GameUtils.getInstance().music = false;
+						txtMusic.content = "Music: OFF";
+					} else {
+						GameUtils.getInstance().music = true;
+						txtMusic.content = "Music: ON";
+					}
 					break;
 				case 1:
-					// Solve Sudoku
-					this.mGame.setScreen(new SolveSudokuScreen(this.mGame));
+					// Music
+					if(GameUtils.getInstance().sound) {
+						GameUtils.getInstance().sound = false;
+						txtSound.content = "Sound: OFF";
+					} else {
+						GameUtils.getInstance().sound = true;
+						txtSound.content = "Sound: ON";
+					}
 					break;
 				case 2:
-					// Setting
-					this.mGame.setScreen(new SettingScreen(this.mGame));
-					break;
-				case 3:
-					// About
-					this.mGame.setScreen(new AboutScreen(mGame));
-					break;
-				case 4:
-					// Exit
-					Gdx.app.exit();
+					this.mGame.setScreen(new MainMenuScreen(mGame));
 					break;
 				default:
 					break;
@@ -259,5 +226,4 @@ public class MainMenuScreen implements Screen {
 			}
 		}
 	}
-
 }

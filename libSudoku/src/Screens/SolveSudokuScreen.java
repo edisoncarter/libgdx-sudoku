@@ -1,29 +1,30 @@
 package Screens;
 
+import GameObjects.CSudoku;
 import GameUtils.*;
-import GameObjects.*;
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.acumenvn.libsudoku.MyMainGame;;
+import com.acumenvn.libsudoku.MyMainGame;
 
+public class SolveSudokuScreen implements Screen {
 
-public class GamePlayScreen implements Screen {
-
-	enum GameMenuIndex {
-		Solve, // 0
-		Check, // 1
-		Reset, // 2
-		Exit, // 3
-	};
-	
-	MyMainGame mGame;
+	private MyMainGame mGame;
+	private SpriteBatch mBatch;
 	// Texture
 	private Texture textureBackgroundInGame;
 	private Texture textureBtn_Check;
@@ -40,26 +41,35 @@ public class GamePlayScreen implements Screen {
 	private Texture textureBtn_solve;
 	private Texture textureWrongMessage;
 	private Texture textureBorderSelect;
-	TextWrapper txtLevel;
-	TextWrapper txtTime;
-	TextWrapper selectedTW;
-	CTimer time;
+	Sound mButtonPush;
 	int menuIndex;
-	Boolean mFlagWrongMsg;
-	int mouseX;
-	int mouseY;
-	SpriteBatch mSpriteBatch;
-	int[][] mLockMatrixNumber = new int[9][9];
-	int[][] mResultMatrix = new int[9][9];
-	private CSudoku mSolveSudoku;
+	CSudoku mSolveSudoku;
 	TextWrapper[][] arrText = new TextWrapper[9][9];
-	int count = 0;
-	Boolean mIsPlayMode;
-	int selectedIndexX;
-	int selectedIndexY;
-	int countToShowWrongMessage;
-	Boolean menuSelected;
-	Vector2 positionForBorder;
+	
+	int[][] m_sudoku =
+            new int[][]
+			{
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0},
+				{0,0,0,0,0,0,0,0,0}
+			};
+	int[][] mLockMatrixNumber = new int[9][9];
+	Boolean m_flagChangeNumber;
+    Boolean m_flagSound = true; 
+    Boolean m_flagSolve = false;
+	 
+    int selectedIndexX;
+    int selectedIndexY;
+    int mouseX;
+    int mouseY;
+    Boolean menuSelected;
+    
 	InputProcessor mInput = new InputProcessor() {
 		
 		@Override
@@ -99,24 +109,17 @@ public class GamePlayScreen implements Screen {
 					menuSelected = true;
 				}
 			}
-			// Checker
-			if(mouseX > 590 && mouseX < 660) {
-				if(mouseY > 150 && mouseY < 190) {
-					menuIndex = 1;
-					menuSelected = true;
-				}
-			}
 			// Reset
 			if(mouseX > 510 && mouseX < 750) {
 				if(mouseY > 410 && mouseY < 460) {
-					menuIndex = 2;
+					menuIndex = 1;
 					menuSelected = true;
 				}
 			}
 			// Exit
 			if(mouseX > 600 && mouseX < 750) {
 				if(mouseY > 480 && mouseY < 550) {
-					menuIndex = 3;
+					menuIndex = 2;
 					menuSelected = true;
 				}
 			}
@@ -129,7 +132,6 @@ public class GamePlayScreen implements Screen {
 				selectedIndexX = x;
 				selectedIndexY = y;
 			}
-			
 			return false;
 		}
 		
@@ -194,7 +196,7 @@ public class GamePlayScreen implements Screen {
 			}
 			if(isNumberPress == true) {
 				if(no > 0) {
-					SoundManager.getInstance().playSound(SoundManager.getInstance().mButtonPush);
+					SoundManager.getInstance().playSound(mButtonPush);
 					mSolveSudoku.sudoku[selectedIndexX][8 - selectedIndexY] = no;
 				}
 			}
@@ -202,50 +204,21 @@ public class GamePlayScreen implements Screen {
 		}
 	};
 	
-	public GamePlayScreen(MyMainGame game) {
+	public SolveSudokuScreen(MyMainGame game) {
 		// TODO Auto-generated constructor stub
 		this.mGame = game;
+		mBatch = new SpriteBatch();
 		menuSelected = false;
-		mSolveSudoku = new CSudoku();
-		for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                mLockMatrixNumber[i][j] = mSolveSudoku.sudoku[i][j];
-            }
-        }
-		countToShowWrongMessage = 0;
-		mResultMatrix = mSolveSudoku.resultMatrix;
-		mSpriteBatch = new SpriteBatch();
 		GameUtils.setInputProcessor(mInput);
-		mFlagWrongMsg = false;
-		String levelStr = "";
-		positionForBorder = new Vector2(0, 0);
-		CTimer.getInstance().resetTimer();
-		switch (GameUtils.getInstance().levelIndex) {
-		case 0:
-			levelStr = "Easy";
-			break;
-		case 1:
-			levelStr = "Normal";
-			break;
-		case 2:
-			levelStr = "Hard";
-			break;
-		default:
-			break;
-		}
-		GameUtils.getInstance().systemFont.scale(-0.2f);
-		initTextWrapper();
-		txtLevel = new TextWrapper(levelStr, new Vector2(670, 365));
-		txtTime = new TextWrapper("00:00:00", new Vector2(675, 287));
-		time =  CTimer.getInstance();
+		mSolveSudoku = new CSudoku(1);
 		initTexture();
+		initTextWrappers();
+		mButtonPush = SoundManager.getInstance().mButtonPush;
 		Gdx.graphics.setContinuousRendering(true);
 		Gdx.graphics.requestRendering();
 	}
 	
-	private void initTextWrapper() {
+	private void initTextWrappers() {
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				arrText[i][j] = new TextWrapper();
@@ -273,35 +246,16 @@ public class GamePlayScreen implements Screen {
 	public void render(float delta) {
 		// TODO Auto-generated method stub
 		GameUtils.clearScreen();
-		mSpriteBatch.begin();
-		mSpriteBatch.draw(textureBackgroundInGame, 0, 0);
-		mSpriteBatch.draw(textureBtn_reset, 610, 150);
-		mSpriteBatch.draw(textureBtn_quit, 610, 70);
-		mSpriteBatch.draw(textureBtn_solve, 710, 410);
-		mIsPlayMode = true;
-		if(mFlagWrongMsg == true){
-			mSpriteBatch.draw(textureWrongMessage, 590, 360);
-			countToShowWrongMessage++;
-			if(countToShowWrongMessage > 500) {
-				mFlagWrongMsg = false;
-				countToShowWrongMessage = 0;
-			}
-		} else {
-			mSpriteBatch.draw(textureBtn_Check, 590, 400);
-		}
+		
+		mBatch.begin();
+		mBatch.draw(textureBackgroundInGame, 0, 0);
+		mBatch.draw(textureBtn_reset, 610, 150);
+		mBatch.draw(textureBtn_quit, 610, 70);
+		mBatch.draw(textureBtn_solve, 710, 410);
 		drawMatrix();
-		txtLevel.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
-		updateTime(delta);
-		mSpriteBatch.end();
+		mBatch.end();
 		
 		handleMouseEvent();
-	}
-	
-	private void updateTime(float dt) {
-		time.updateTime(dt);
-		txtTime.content = time.toString();
-		txtTime.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
-	
 	}
 
 	@Override
@@ -313,7 +267,7 @@ public class GamePlayScreen implements Screen {
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundStartGame);
+		
 	}
 
 	@Override
@@ -340,84 +294,6 @@ public class GamePlayScreen implements Screen {
 		
 	}
 	
-	private void handleMouseEvent() {
-		if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
-			if(menuSelected) {
-				handleButtonsEvent();
-			} else {
-				if(mouseX > 30 && mouseY < 570 &&
-						mouseY > 30 && mouseY < 570) {
-						int x = (mouseX - 30) / 60;
-						int y = (mouseY - 30) / 60;
-						if(mLockMatrixNumber[x][8-y] == 0) {
-							positionForBorder.x = x*60 + 35;
-							positionForBorder.y  = (8-y)*60 + 30;
-						} else {
-							positionForBorder.x = 0;
-							positionForBorder.y = 0;
-						}
-						
-					}
-				if(positionForBorder.x != 0 || positionForBorder.y != 0) {
-					mSpriteBatch.begin();
-					mSpriteBatch.draw(textureBorderSelect, positionForBorder.x, positionForBorder.y);
-					mSpriteBatch.end();
-				}
-			}
-		} else {
-			textureBtn_quit = textureBtn_quitOn;
-			textureBtn_reset = textureBtn_resetOn;
-		}
-	}
-	
-	private void handleButtonsEvent() {
-		switch (menuIndex) {
-		case 0:
-			// Solve
-			mSolveSudoku.solve();
-			mSolveSudoku.showSolve();
-			break;
-		case 1:
-			// Checker
-			checkResult();
-			break;
-		case 2:
-			// Reset
-			resetEvent();
-			textureBtn_reset = textureBtn_resetOff;
-			break;
-		case 3:
-			// Exit
-			textureBtn_quit = textureBtn_quitOff;
-			this.mGame.setScreen(new MainMenuScreen(mGame));
-			break;
-		default:
-			break;
-		}
-	}
-	
-	private void checkResult() {
-		if(mSolveSudoku.flagCheckResult() == true) {
-			String timeStr = CTimer.getInstance().toString();
-			GameOverScreen sc = new GameOverScreen(mGame);
-			sc.timeStr = timeStr;
-			this.mGame.setScreen(sc);
-		} else {
-			mFlagWrongMsg = true;
-		}
-	}
-	
-	private void resetEvent() {
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				if (mLockMatrixNumber[i][j] == 0)
-                {
-					mSolveSudoku.sudoku[i][j] = 0;
-                }
-			}
-		}
-	}
-	
 	private void drawMatrix() {
 		for (int i = 0; i < 9; i++)
         {
@@ -433,7 +309,7 @@ public class GamePlayScreen implements Screen {
                     TextWrapper tempTW = arrText[i][j];
                     tempTW.content = tempStr;
                     tempTW.position = new Vector2(x,y);
-                    tempTW.Draw(mSpriteBatch, GameUtils.getInstance().lockMatrixFont, Color.BLUE);
+                    tempTW.Draw(mBatch, GameUtils.getInstance().lockMatrixFont, Color.BLUE);
                 }
                 if (mLockMatrixNumber[i][j] == 0 && mSolveSudoku.sudoku[i][j] != 0)
                 {
@@ -444,9 +320,69 @@ public class GamePlayScreen implements Screen {
                     TextWrapper tempTW = arrText[i][j];
                     tempTW.content = tempStr;
                     tempTW.position = new Vector2(x,y);
-                    tempTW.Draw(mSpriteBatch, GameUtils.getInstance().systemFont, Color.WHITE);
+                    tempTW.Draw(mBatch, GameUtils.getInstance().systemFont, Color.WHITE);
                 }
             }
         }
 	}
+	
+	private void handleMouseEvent() {
+		if(Gdx.input.isButtonPressed(Buttons.LEFT)) {
+			if(menuSelected) {
+				switch (menuIndex) {
+				case 0:
+					// Solve
+					solveSudoku();
+					break;
+				case 1:
+					// Reset
+					textureBtn_reset = textureBtn_resetOff;
+					resetSudoku();
+					break;
+				case 2:
+					// Exit
+					textureBtn_quit = textureBtn_quitOff;
+					this.mGame.setScreen(new MainMenuScreen(this.mGame));
+					break;
+				default:
+					break;
+				}
+			}
+		} else {
+			textureBtn_reset = textureBtn_resetOn;
+			textureBtn_quit = textureBtn_quitOn;
+		}
+	}
+
+	private void solveSudoku() {
+		//copy cells from m_sudoku to m_lockMatrix
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				if(mSolveSudoku.sudoku[i][j] != 0) {
+					mLockMatrixNumber[i][j] = mSolveSudoku.sudoku[i][j];
+				}
+			}
+		}
+		mSolveSudoku.copyToV3();
+		if(mSolveSudoku.solve() == true) {
+			mSolveSudoku.showSolve();
+			m_flagSolve = true;
+		} else {
+			// if player's answer is wrong, then draw wrong message dialog
+			for (int i = 0; i < 9; i++) {
+				for (int j = 0; j < 9; j++) {
+					mLockMatrixNumber[i][j] = 0;
+				}
+			}
+		}
+	}
+	
+	private void resetSudoku() {
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				mSolveSudoku.sudoku[i][j] = 0;
+			}
+		}
+	}
+	
 }

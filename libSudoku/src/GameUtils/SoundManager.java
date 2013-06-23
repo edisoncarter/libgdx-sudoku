@@ -13,14 +13,20 @@ public class SoundManager {
 		return instance;
 	}
 	
+	public Sound mSoundSwitchMenu;
+	public Sound mSoundFinish;
 	public Sound mSoundSelectMenu;
-	public Sound mSoundMenuClick;
+	public Sound mSoundStartGame;
+	public Sound mButtonPush;
 	
 	
 	public SoundManager() {
 		// TODO Auto-generated constructor stub
-		mSoundSelectMenu = loadSound("Sounds/switchMenu.mp3"); // switch
-		mSoundMenuClick = loadSound("Sounds/buttonpush.wav"); // select
+		mButtonPush = loadSound("Sounds/buttonpush.mp3");
+		mSoundFinish = loadSound("Sounds/finish.mp3");
+		mSoundSelectMenu = loadSound("Sounds/SelectMenu.mp3");
+		mSoundStartGame = loadSound("Sounds/startgame.mp3");
+		mSoundSwitchMenu = loadSound("Sounds/switchMenu.mp3");
 	}
 	
 	public Sound loadSound(String filePath) {
