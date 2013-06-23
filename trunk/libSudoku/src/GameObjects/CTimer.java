@@ -38,7 +38,6 @@ public class CTimer {
 	}
 	
 	public String toString() {
-//		NSString *timeStr = [NSString stringWithFormat:@"%dh %dm %ds",hours, mins, secs];
 		String timeStr = hour + ":" + minute + ":" + second;
 		return timeStr;
 	}

@@ -2,6 +2,7 @@ package GameObjects;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 
 public class CSudoku {
@@ -35,6 +36,11 @@ public class CSudoku {
 			}
 		}
 		mV3 = new Vector3[9][9];
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				mV3[i][j] = new Vector3();
+			}
+		}
 		createSubRegions();
 		mLevel = new CLevel();
 		copyToV3();
@@ -53,6 +59,11 @@ public class CSudoku {
 	
 	public  CSudoku(int type) {
 		mV3 = new Vector3[9][9];
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				mV3[i][j] = new Vector3();
+			}
+		}
 		copyToV3();
 	}
 
@@ -63,6 +74,7 @@ public class CSudoku {
 			for (int j = 0; j < 9; j++)
 			{
 				if(mLevel.emptyMatrix[i][j] == 0) {
+//					Gdx.app.log("i " + i, "j " + j);
 					sudoku[i][j] = 0;
 				}
 			}
@@ -208,6 +220,7 @@ public class CSudoku {
 			{
 				if (sudoku[i][j]==0)
 				{
+					Gdx.app.log("1", "");
 					return false;
 				}
 			}
@@ -223,11 +236,13 @@ public class CSudoku {
 						if ((l != j) && (sudoku[i][l] == sudoku[i][j]))
 						{
 							// Wrong row
+							Gdx.app.log("2", "");
 							return false;
 						}
 						if ((l != i) && (sudoku[l][j] == sudoku[i][j]))
 						{
 							// Wrong column
+							Gdx.app.log("3", "");
 							return false;
 						}
 					}
@@ -239,7 +254,7 @@ public class CSudoku {
 							if (mSubquare[x][y] == squareIndex)
 							{
 								if (((x != i) || (y != j)) 
-									&& (mSubquare[x][y] == sudoku[i][j]))
+									&& (sudoku[x][y] == sudoku[i][j]))
 								{
 									// Wrong region
 									return false;
@@ -318,18 +333,18 @@ public class CSudoku {
 					y = getCase(j);
 					// Generate a random number with random position in this region
 					generateRegion(x, x + 3, y, y + 3);
-					i = 3;
-					j = 3;
+					i = 2;
+					j = 2;
 				}
-				if (i == 3 && j == 3)
+				if (i == 2 && j == 2)
 				{
 					x = getCase(i);
 					y = getCase(j);
 					generateRegion(x, x + 3, y, y + 3);
-					i = 6;
-					j = 6;
+					i = 5;
+					j = 5;
 				}
-				if (i == 6 && j == 6)
+				if (i == 5 && j == 5)
 				{
 					x = getCase(i);
 					y = getCase(j);
@@ -341,9 +356,11 @@ public class CSudoku {
 
 	private void generateRegion(int xStart,int xEnd,int yStart,int yEnd) {
 		// TODO Auto-generated method stub
-		int x = rand.nextInt()*(xEnd - xStart + 1) + xStart;
-		int y = rand.nextInt()*(yEnd - yStart + 1) + yStart;
-		int number = rand.nextInt()*9 + 1;
+//		Gdx.app.log("xStart" + xStart + " xEnd: " + xEnd , "yStart: " + yStart + " yEnd: " + yEnd);
+		int x = rand.nextInt(xEnd - xStart + 1) + xStart;
+		int y = rand.nextInt(yEnd - yStart + 1) + yStart;
+		int number = rand.nextInt(9) + 1;
+//		Gdx.app.log("X" + x, "Y" + y);
 		sudoku[x][y] = number;
 	}
 }

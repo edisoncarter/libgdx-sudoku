@@ -30,8 +30,11 @@ public class TextureManager {
 	public Texture textureBtn_checker;
 	public Texture textureBtn_solve;
 	public Texture textureWrongMessage;
+	public Texture textureBorderSelect;
+	public Texture textureVictory;
 	
-	
+	public Texture textureBtnSelected;
+	public Texture textureBtnUnselected;
 	
 	// Constructor
 	public TextureManager() {
@@ -39,7 +42,7 @@ public class TextureManager {
 		textureBackgroundOutGame = new Texture("Images/background_MainMenu.png");
 		textureMainMenuSelector = new Texture("Images/mainMenuSelector.png");
 		textureBackgroundInGame = new Texture("Images/gamescreenBG.png");
-		
+		textureVictory = new Texture("Images/Victory.png");
 		// Buttons
 		textureBtn_Check = new Texture("Images/Check.png");
 		textureBtn_Wrong = new Texture("Images/wrong.png");
@@ -52,6 +55,10 @@ public class TextureManager {
 		textureBtn_checker = new Texture("Images/Solve.png");
 		textureBtn_solve = new Texture("Images/wrong.png");
 		textureWrongMessage = new Texture("Images/wrongmess.png");
+		textureBorderSelect = new Texture("Images/BorderSelect.png");
+		
+		textureBtnSelected = new Texture("Images/btnSelected.png");
+		textureBtnUnselected = new Texture("Images/btnUnselected.png");
 	}
 	
 	// Methods
