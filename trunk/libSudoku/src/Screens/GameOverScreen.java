@@ -143,7 +143,7 @@ public class GameOverScreen implements Screen {
 	public void show() {
 		// TODO Auto-generated method stub
 		txtTime.content = "In: " + timeStr;
-		SoundManager.getInstance().playSound(mSoundFinish);
+		SoundManager.getInstance().playMusic(mSoundFinish);
 	}
 
 	@Override
@@ -167,7 +167,7 @@ public class GameOverScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+		mBatch.dispose();
 	}
 
 }

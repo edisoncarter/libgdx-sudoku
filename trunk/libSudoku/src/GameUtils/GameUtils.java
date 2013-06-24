@@ -51,5 +51,4 @@ public class GameUtils {
 		aboutFont = new BitmapFont(Gdx.files.internal("Fonts/aboutFont.fnt"), false);
 		lockMatrixFont = new BitmapFont(Gdx.files.internal("Fonts/myFont.fnt"), false);
 	}
-	
 }

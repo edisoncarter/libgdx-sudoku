@@ -191,7 +191,7 @@ public class ChooseLevel implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+		mSpriteBatch.dispose();
 	}
 
 	private void goToGame() {

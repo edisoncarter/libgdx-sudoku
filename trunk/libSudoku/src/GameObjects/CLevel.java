@@ -69,6 +69,4 @@ public class CLevel {
 			} while (isDuplicate == true);
 		}
 	}
-	
-	
 }

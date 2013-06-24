@@ -159,8 +159,6 @@ public class AboutScreen implements Screen {
 	public void dispose() {
 		// TODO Auto-generated method stub
 		mBatch.dispose();
-		mTextureBackground.dispose();
-		
 	}
 	
 	private void handleInput() {

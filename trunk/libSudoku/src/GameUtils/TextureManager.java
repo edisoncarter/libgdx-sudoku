@@ -35,6 +35,7 @@ public class TextureManager {
 	
 	public Texture textureBtnSelected;
 	public Texture textureBtnUnselected;
+	public Texture textureWrongInput;
 	
 	// Constructor
 	public TextureManager() {
@@ -59,8 +60,32 @@ public class TextureManager {
 		
 		textureBtnSelected = new Texture("Images/btnSelected.png");
 		textureBtnUnselected = new Texture("Images/btnUnselected.png");
+		textureWrongInput = new Texture("Images/wronginput.png");
 	}
 	
 	// Methods
+	public void dispose() {
 	
+		textureBackgroundOutGame.dispose();
+		textureMainMenuSelector.dispose();
+		textureBackgroundInGame.dispose();
+		textureVictory.dispose();
+		// Buttons
+		textureBtn_Check.dispose();
+		textureBtn_Wrong.dispose();
+		textureBtn_quitOn.dispose();
+		textureBtn_quitOff.dispose();
+		textureBtn_resetOn.dispose();
+		textureBtn_resetOff.dispose();
+		textureBtn_settingOn.dispose();
+		textureBtn_settingOff.dispose();
+		textureBtn_checker.dispose();
+		textureBtn_solve.dispose();
+		textureWrongMessage.dispose();
+		textureBorderSelect.dispose();
+		
+		textureBtnSelected.dispose();
+		textureBtnUnselected.dispose();
+
+	}
 }

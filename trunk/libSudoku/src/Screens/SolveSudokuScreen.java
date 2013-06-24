@@ -41,11 +41,22 @@ public class SolveSudokuScreen implements Screen {
 	private Texture textureBtn_solve;
 	private Texture textureWrongMessage;
 	private Texture textureBorderSelect;
+	private Texture textureWrongInput;
 	Sound mButtonPush;
 	int menuIndex;
 	CSudoku mSolveSudoku;
 	TextWrapper[][] arrText = new TextWrapper[9][9];
-	
+	int[][] mFirstSudoku = new int[][] {
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0}	
+	};
 	int[][] m_sudoku =
             new int[][]
 			{
@@ -63,13 +74,13 @@ public class SolveSudokuScreen implements Screen {
 	Boolean m_flagChangeNumber;
     Boolean m_flagSound = true; 
     Boolean m_flagSolve = false;
-	 
+	Boolean m_flagWrongInput = false;
     int selectedIndexX;
     int selectedIndexY;
     int mouseX;
     int mouseY;
     Boolean menuSelected;
-    
+    int countShowWrongInputDialog;
 	InputProcessor mInput = new InputProcessor() {
 		
 		@Override
@@ -198,6 +209,7 @@ public class SolveSudokuScreen implements Screen {
 				if(no > 0) {
 					SoundManager.getInstance().playSound(mButtonPush);
 					mSolveSudoku.sudoku[selectedIndexX][8 - selectedIndexY] = no;
+					mFirstSudoku[selectedIndexX][8 - selectedIndexY] = no;
 				}
 			}
 			return false;
@@ -210,6 +222,7 @@ public class SolveSudokuScreen implements Screen {
 		mBatch = new SpriteBatch();
 		menuSelected = false;
 		GameUtils.setInputProcessor(mInput);
+		countShowWrongInputDialog = 0;
 		mSolveSudoku = new CSudoku(1);
 		initTexture();
 		initTextWrappers();
@@ -236,7 +249,7 @@ public class SolveSudokuScreen implements Screen {
 		textureBtn_resetOff = TextureManager.getInstance().textureBtn_resetOff;
 		textureBtn_solve = TextureManager.getInstance().textureBtn_checker;
 		textureWrongMessage = TextureManager.getInstance().textureWrongMessage;
-		
+		textureWrongInput = TextureManager.getInstance().textureWrongInput;
 		textureBtn_quit = textureBtn_quitOn;
 		textureBtn_reset = textureBtn_resetOn;
 		textureBorderSelect = TextureManager.getInstance().textureBorderSelect;
@@ -252,6 +265,13 @@ public class SolveSudokuScreen implements Screen {
 		mBatch.draw(textureBtn_reset, 610, 150);
 		mBatch.draw(textureBtn_quit, 610, 70);
 		mBatch.draw(textureBtn_solve, 710, 410);
+		if(m_flagWrongInput == true) {
+			countShowWrongInputDialog++;
+			mBatch.draw(textureWrongInput, 590, 360);
+			if(countShowWrongInputDialog > 500) {
+				m_flagWrongInput = false;
+			}
+		}
 		drawMatrix();
 		mBatch.end();
 		
@@ -291,7 +311,7 @@ public class SolveSudokuScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+		mBatch.dispose();
 	}
 	
 	private void drawMatrix() {
@@ -311,7 +331,7 @@ public class SolveSudokuScreen implements Screen {
                     tempTW.position = new Vector2(x,y);
                     tempTW.Draw(mBatch, GameUtils.getInstance().lockMatrixFont, Color.BLUE);
                 }
-                if (mLockMatrixNumber[i][j] == 0 && mSolveSudoku.sudoku[i][j] != 0)
+                if (mLockMatrixNumber[i][j] == 0 &&  mSolveSudoku.sudoku[i][j] != 0)
                 {
                 	int tempNumber = mSolveSudoku.sudoku[i][j];
                 	String tempStr = Integer.toString(tempNumber);
@@ -356,13 +376,13 @@ public class SolveSudokuScreen implements Screen {
 
 	private void solveSudoku() {
 		//copy cells from m_sudoku to m_lockMatrix
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				if(mSolveSudoku.sudoku[i][j] != 0) {
-					mLockMatrixNumber[i][j] = mSolveSudoku.sudoku[i][j];
-				}
-			}
-		}
+//		for (int i = 0; i < 9; i++) {
+//			for (int j = 0; j < 9; j++) {
+//				if(mSolveSudoku.sudoku[i][j] != 0) {
+//					mLockMatrixNumber[i][j] = mSolveSudoku.sudoku[i][j];
+//				}
+//			}
+//		}
 		mSolveSudoku.copyToV3();
 		if(mSolveSudoku.solve() == true) {
 			mSolveSudoku.showSolve();
@@ -374,6 +394,8 @@ public class SolveSudokuScreen implements Screen {
 					mLockMatrixNumber[i][j] = 0;
 				}
 			}
+			m_flagWrongInput = true;
+			countShowWrongInputDialog = 0;
 		}
 	}
 	
