@@ -35,7 +35,7 @@ public class SoundManager {
 	
 	public void playSound(Sound s) {
 		if(GameUtils.getInstance().sound == true) {
-			s.play();
+			s.play(1.0f);
 		}
 	}
 	

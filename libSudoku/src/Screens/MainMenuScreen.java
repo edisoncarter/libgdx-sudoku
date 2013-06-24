@@ -84,7 +84,6 @@ public class MainMenuScreen implements Screen {
 				SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundSwitchMenu);
 			}
 			
-			
 			// Solve
 			if(screenX > 65 && screenX < 200 && 
 					screenY > 210 && screenY < 240) {
@@ -251,6 +250,7 @@ public class MainMenuScreen implements Screen {
 					break;
 				case 4:
 					// Exit
+					TextureManager.getInstance().dispose();
 					Gdx.app.exit();
 					break;
 				default:

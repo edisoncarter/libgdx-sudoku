@@ -91,6 +91,7 @@ public class GamePlayScreen implements Screen {
 			// TODO Auto-generated method stub
 			mouseX = screenX;
 			mouseY = screenY;
+			Gdx.app.log("Mouse X: " + mouseX, "Mouse Y: " + mouseY);
 			// Solve
 			menuSelected = false;
 			if(mouseX > 700 && mouseX < 760) {
@@ -313,7 +314,7 @@ public class GamePlayScreen implements Screen {
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		SoundManager.getInstance().playSound(SoundManager.getInstance().mSoundStartGame);
+		SoundManager.getInstance().playMusic(SoundManager.getInstance().mSoundStartGame);
 	}
 
 	@Override
@@ -337,7 +338,7 @@ public class GamePlayScreen implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
+		mSpriteBatch.dispose();
 	}
 	
 	private void handleMouseEvent() {
@@ -345,8 +346,8 @@ public class GamePlayScreen implements Screen {
 			if(menuSelected) {
 				handleButtonsEvent();
 			} else {
-				if(mouseX > 30 && mouseY < 570 &&
-						mouseY > 30 && mouseY < 570) {
+				if(mouseX > 30 && mouseX < 570 ) {
+					if(mouseY > 30 && mouseY < 570) {
 						int x = (mouseX - 30) / 60;
 						int y = (mouseY - 30) / 60;
 						if(mLockMatrixNumber[x][8-y] == 0) {
@@ -356,8 +357,8 @@ public class GamePlayScreen implements Screen {
 							positionForBorder.x = 0;
 							positionForBorder.y = 0;
 						}
-						
-					}
+					}		
+				}
 				if(positionForBorder.x != 0 || positionForBorder.y != 0) {
 					mSpriteBatch.begin();
 					mSpriteBatch.draw(textureBorderSelect, positionForBorder.x, positionForBorder.y);
